@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>Poster dan Brosur Hidup</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="ar-container"></div>
+
+  <div id="status">Memuat...</div>
+
+  <button id="start-btn" class="hidden">Mulai AR</button>
+
+  <div id="info-panel" class="hidden">
+    <h2 id="info-judul"></h2>
+    <p id="info-deskripsi"></p>
+    <a id="info-tautan" href="#" target="_blank" rel="noopener">Buka situs</a>
+  </div>
+
+  <div id="error-box" class="hidden"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

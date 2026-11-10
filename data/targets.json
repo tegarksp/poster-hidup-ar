@@ -1,0 +1,28 @@
+{
+  "targets": [
+    {
+      "index": 0,
+      "id": "target-1",
+      "judul": "ISI JUDUL 1",
+      "deskripsi": "ISI DESKRIPSI 1",
+      "tautan": "https://contoh.ac.id",
+      "model": "assets/models/model1.glb",
+      "skala": 0.5,
+      "animasiIdle": "NAMA_KLIP_IDLE",
+      "animasiAksi": "NAMA_KLIP_AKSI",
+      "audio": "assets/audio/audio1.mp3"
+    },
+    {
+      "index": 1,
+      "id": "target-2",
+      "judul": "ISI JUDUL 2",
+      "deskripsi": "ISI DESKRIPSI 2",
+      "tautan": "https://contoh.ac.id",
+      "model": "assets/models/model2.glb",
+      "skala": 0.5,
+      "animasiIdle": "NAMA_KLIP_IDLE",
+      "animasiAksi": "NAMA_KLIP_AKSI",
+      "audio": "assets/audio/audio2.mp3"
+    }
+  ]
+}
