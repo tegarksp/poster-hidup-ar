@@ -86,7 +86,7 @@ async function init() {
 async function startAR(targets) {
   const mindarThree = new MindARThree({
     container: document.getElementById('ar-container'),
-    imageTargetSrc: 'assets/targets/targets.mind',
+    imageTargetSrc: 'assets/targets/targets1.mind',
     uiLoading: 'no', uiScanning: 'no', uiError: 'no'
   });
   const { renderer, scene, camera } = mindarThree;
@@ -192,7 +192,8 @@ async function startAR(targets) {
   try {
     await mindarThree.start();
   } catch (e) {
-    return showError('Kamera tidak dapat diakses. Izinkan akses kamera di pengaturan browser, lalu muat ulang halaman.');
+    const detail = e instanceof Error ? e.message : String(e);
+    return showError(`AR gagal dimulai. Periksa izin kamera dan file target AR. Detail: ${detail}`);
   }
 
   setStatus('Mencari target...');
