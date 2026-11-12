@@ -184,10 +184,15 @@ async function startAR(targets) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const canvas = renderer.domElement;
-  canvas.style.touchAction = 'none';
+  const interactionArea = mindarThree.container;
+  interactionArea.style.touchAction = 'none';
+  canvas.style.pointerEvents = 'auto';
+  if (mindarThree.cssRenderer?.domElement) {
+    mindarThree.cssRenderer.domElement.style.pointerEvents = 'none';
+  }
 
   function itemAt(x, y) {
-    const r = canvas.getBoundingClientRect();
+    const r = interactionArea.getBoundingClientRect();
     pointer.x = ((x - r.left) / r.width) * 2 - 1;
     pointer.y = -((y - r.top) / r.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
@@ -215,9 +220,9 @@ async function startAR(targets) {
   let suppressTap = false;
   const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-  canvas.addEventListener('pointerdown', (e) => {
+  interactionArea.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    canvas.setPointerCapture(e.pointerId);
+    interactionArea.setPointerCapture(e.pointerId);
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (activePointers.size === 1) {
@@ -240,7 +245,7 @@ async function startAR(targets) {
     }
   });
 
-  canvas.addEventListener('pointermove', (e) => {
+  interactionArea.addEventListener('pointermove', (e) => {
     if (!activePointers.has(e.pointerId)) return;
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
@@ -271,8 +276,8 @@ async function startAR(targets) {
     if (activePointers.size === 0) suppressTap = false;
   }
 
-  canvas.addEventListener('pointerup', finishPointer);
-  canvas.addEventListener('pointercancel', finishPointer);
+  interactionArea.addEventListener('pointerup', finishPointer);
+  interactionArea.addEventListener('pointercancel', finishPointer);
 
   // ---------- Nyalakan kamera ----------
   if (!window.isSecureContext) {
