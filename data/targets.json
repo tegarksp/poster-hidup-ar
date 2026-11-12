@@ -23,6 +23,42 @@
       "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio2.mp3"
+    },
+    {
+      "index": 2,
+      "id": "target-3",
+      "judul": "ISI JUDUL 3",
+      "deskripsi": "ISI DESKRIPSI 3",
+      "tautan": "https://contoh.ac.id",
+      "model": "assets/models/model3.glb",
+      "skala": 0.5,
+      "animasiIdle": "NAMA_KLIP_IDLE",
+      "animasiAksi": "NAMA_KLIP_AKSI",
+      "audio": "assets/audio/audio3.mp3"
+    },
+    {
+      "index": 3,
+      "id": "target-4",
+      "judul": "ISI JUDUL 4",
+      "deskripsi": "ISI DESKRIPSI 4",
+      "tautan": "https://contoh.ac.id",
+      "model": "assets/models/model4.glb",
+      "skala": 0.5,
+      "animasiIdle": "NAMA_KLIP_IDLE",
+      "animasiAksi": "NAMA_KLIP_AKSI",
+      "audio": "assets/audio/audio4.mp3"
+    },
+    {
+      "index": 4,
+      "id": "target-5",
+      "judul": "ISI JUDUL 5",
+      "deskripsi": "ISI DESKRIPSI 5",
+      "tautan": "https://contoh.ac.id",
+      "model": "assets/models/model5.glb",
+      "skala": 0.5,
+      "animasiIdle": "NAMA_KLIP_IDLE",
+      "animasiAksi": "NAMA_KLIP_AKSI",
+      "audio": "assets/audio/audio5.mp3"
     }
   ]
 }

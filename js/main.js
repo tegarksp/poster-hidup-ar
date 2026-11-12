@@ -86,7 +86,7 @@ async function init() {
 async function startAR(targets) {
   const mindarThree = new MindARThree({
     container: document.getElementById('ar-container'),
-    imageTargetSrc: 'assets/targets/targets1.mind',
+    imageTargetSrc: 'assets/targets/targets.mind',
     uiLoading: 'no', uiScanning: 'no', uiError: 'no'
   });
   const { renderer, scene, camera } = mindarThree;
@@ -116,7 +116,15 @@ async function startAR(targets) {
     const idleAction = idleClip ? mixer.clipAction(idleClip) : null;
     const aksiAction = aksiClip ? mixer.clipAction(aksiClip) : null;
     idleAction?.play();
-    if (aksiAction) aksiAction.setLoop(THREE.LoopOnce, 1);
+    if (aksiAction) {
+      aksiAction.setLoop(THREE.LoopOnce, 1);
+      aksiAction.clampWhenFinished = true;
+      mixer.addEventListener('finished', (event) => {
+        if (event.action !== aksiAction) return;
+        aksiAction.fadeOut(0.15);
+        idleAction?.reset().fadeIn(0.15).play();
+      });
+    }
 
     anchor.onTargetFound = () => {
       setStatus('Target ditemukan: ' + t.judul, true);
@@ -141,65 +149,136 @@ async function startAR(targets) {
       if (s) { s.pause(); s.currentTime = 0; }
     };
 
-    items.push({ anchor, model, mixer, idleAction, aksiAction, data: t });
+    items.push({ anchor, model, mixer, idleAction, aksiAction, data: t, tapAnimation: null });
   }
 
-  // ---------- Ketuk: putar animasi aksi ----------
+  // ---------- Interaksi sentuh: ketuk dan cubit ----------
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const canvas = renderer.domElement;
+  canvas.style.touchAction = 'none';
 
-  canvas.addEventListener('pointerdown', (e) => {
+  function itemAt(x, y) {
     const r = canvas.getBoundingClientRect();
-    pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-    pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    pointer.x = ((x - r.left) / r.width) * 2 - 1;
+    pointer.y = -((y - r.top) / r.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
 
     for (const it of items) {
-      if (!it.anchor.group.visible || !it.aksiAction) continue;
-      if (raycaster.intersectObject(it.model, true).length) {
-        it.aksiAction.reset().play();
-        if (navigator.vibrate) navigator.vibrate(30);
-      }
+      if (!it.anchor.group.visible) continue;
+      if (raycaster.intersectObject(it.model, true).length) return it;
+    }
+    return null;
+  }
+
+  function playAction(item) {
+    if (item.aksiAction) {
+      item.idleAction?.fadeOut(0.12);
+      item.aksiAction.reset().fadeIn(0.12).play();
+    } else {
+      item.tapAnimation = { startedAt: performance.now(), startRotation: item.model.rotation.y };
+    }
+    if (navigator.vibrate) navigator.vibrate(30);
+  }
+
+  const activePointers = new Map();
+  let tapCandidate = null;
+  let pinchSession = null;
+  let suppressTap = false;
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    canvas.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointers.size === 1) {
+      tapCandidate = { pointerId: e.pointerId, x: e.clientX, y: e.clientY, item: itemAt(e.clientX, e.clientY) };
+      return;
+    }
+
+    if (activePointers.size === 2) {
+      suppressTap = true;
+      tapCandidate = null;
+      const points = [...activePointers.values()];
+      const midpoint = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+      const item = itemAt(midpoint.x, midpoint.y) || items.find(it => it.anchor.group.visible);
+      pinchSession = item ? {
+        pointerIds: [...activePointers.keys()],
+        item,
+        startDistance: Math.max(distance(points[0], points[1]), 1),
+        startScale: item.model.scale.x
+      } : null;
     }
   });
 
-  // ---------- Cubit: perbesar/perkecil ----------
-  let startDist = 0;
-  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-  const baseScale = new Map(items.map(it => [it, it.model.scale.x]));
+  canvas.addEventListener('pointermove', (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-  canvas.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      startDist = dist(e.touches);
-      items.forEach(it => baseScale.set(it, it.model.scale.x));
+    if (tapCandidate?.pointerId === e.pointerId &&
+        Math.hypot(e.clientX - tapCandidate.x, e.clientY - tapCandidate.y) > 10) {
+      tapCandidate = null;
     }
-  }, { passive: true });
 
-  canvas.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2 && startDist) {
-      const factor = dist(e.touches) / startDist;
-      items.forEach(it => {
-        const s = THREE.MathUtils.clamp(baseScale.get(it) * factor, 0.1, 3);
-        it.model.scale.setScalar(s);
-      });
+    if (!pinchSession || !pinchSession.pointerIds.every(id => activePointers.has(id))) return;
+    const points = pinchSession.pointerIds.map(id => activePointers.get(id));
+    const factor = distance(points[0], points[1]) / pinchSession.startDistance;
+    const scale = THREE.MathUtils.clamp(pinchSession.startScale * factor, 0.1, 3);
+    pinchSession.item.model.scale.setScalar(scale);
+  });
+
+  function finishPointer(e) {
+    if (e.type === 'pointerup' && tapCandidate?.pointerId === e.pointerId && !suppressTap) {
+      const item = itemAt(e.clientX, e.clientY) || tapCandidate.item;
+      if (item) playAction(item);
     }
-  }, { passive: true });
+    activePointers.delete(e.pointerId);
+    tapCandidate = null;
+    if (activePointers.size < 2) pinchSession = null;
+    if (activePointers.size === 0) suppressTap = false;
+  }
 
-  canvas.addEventListener('touchend', () => { startDist = 0; });
+  canvas.addEventListener('pointerup', finishPointer);
+  canvas.addEventListener('pointercancel', finishPointer);
 
   // ---------- Nyalakan kamera ----------
+  if (!window.isSecureContext) {
+    return showError('Kamera membutuhkan koneksi aman. Buka halaman melalui HTTPS atau localhost.');
+  }
+  if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+    return showError('Browser tidak menyediakan akses kamera. Buka halaman melalui HTTPS atau localhost, lalu coba browser lain.');
+  }
+
   try {
     await mindarThree.start();
   } catch (e) {
-    const detail = e instanceof Error ? e.message : String(e);
-    return showError(`AR gagal dimulai. Periksa izin kamera dan file target AR. Detail: ${detail}`);
+    console.error('AR gagal:', e, 'tipe:', typeof e);
+    const nama = e?.name;
+    if (nama === 'NotAllowedError') {
+      return showError('Izin kamera ditolak. Izinkan akses kamera lalu muat ulang halaman.');
+    }
+    if (nama === 'NotFoundError') {
+      return showError('Kamera tidak ditemukan di perangkat ini.');
+    }
+    if (nama === 'NotReadableError') {
+      return showError('Kamera sedang dipakai aplikasi lain.');
+    }
+    return showError('Kamera gagal dimulai. Izinkan akses kamera untuk situs ini, tutup aplikasi lain yang memakai kamera, lalu coba lagi. MindAR tidak memberikan detail error dari browser.');
   }
 
   setStatus('Mencari target...');
   renderer.setAnimationLoop(() => {
     const dt = clock.getDelta();
-    items.forEach(it => it.mixer.update(dt));
+    items.forEach(it => {
+      it.mixer.update(dt);
+      if (it.tapAnimation) {
+        const progress = Math.min((performance.now() - it.tapAnimation.startedAt) / 700, 1);
+        const eased = 1 - (1 - progress) ** 3;
+        it.model.rotation.y = it.tapAnimation.startRotation + Math.PI * 2 * eased;
+        if (progress === 1) it.tapAnimation = null;
+      }
+    });
     renderer.render(scene, camera);
   });
 }
