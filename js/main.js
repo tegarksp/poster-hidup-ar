@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
+document.title = 'Poster Hidup v16';
 
 // ---------- Elemen HTML ----------
 const statusEl = document.getElementById('status');
@@ -98,7 +99,8 @@ async function startAR(targets) {
   const scanned = new Set(loadScanned());
   const items = []; // { anchor, model, mixer, idleAction, aksiAction, data }
 
-  for (const t of targets) {
+  for (const [i, t] of targets.entries()) {
+    setStatus(`Memuat model ${i + 1} dari ${targets.length}...`);
     const anchor = mindarThree.addAnchor(t.index);
 
     let gltf;
@@ -250,9 +252,16 @@ async function startAR(targets) {
     return showError('Browser tidak menyediakan akses kamera. Buka halaman melalui HTTPS atau localhost, lalu coba browser lain.');
   }
 
+  setStatus('Menyalakan kamera dan menyiapkan pelacak...');
+  const pengingat = setTimeout(() => {
+    setStatus('Masih menyiapkan pelacak... mohon tunggu');
+  }, 8000);
+
   try {
     await mindarThree.start();
+    clearTimeout(pengingat);
   } catch (e) {
+    clearTimeout(pengingat);
     console.error('AR gagal:', e, 'tipe:', typeof e);
     const nama = e?.name;
     if (nama === 'NotAllowedError') {
