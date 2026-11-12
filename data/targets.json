@@ -8,7 +8,7 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
-      "animasiAksi": "NAMA_KLIP_AKSI",
+      "animasiAksi": "Armature|ArmatureAction",
       "audio": "assets/audio/audio1.mp3"
     },
     {
@@ -19,7 +19,8 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model2.glb",
       "skala": 0.5,
-      "animasiAksi": "NAMA_KLIP_AKSI",
+      "animasiIdle": "idle",
+      "animasiAksi": "positive_reaction",
       "audio": "assets/audio/audio2.mp3"
     },
     {
@@ -30,7 +31,7 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model3.glb",
       "skala": 0.5,
-      "animasiAksi": "NAMA_KLIP_AKSI",
+      "animasiAksi": "animat",
       "audio": "assets/audio/audio3.mp3"
     },
     {
@@ -41,7 +42,8 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model4.glb",
       "skala": 0.5,
-      "animasiAksi": "NAMA_KLIP_AKSI",
+      "animasiIdle": "Idle",
+      "animasiAksi": "FlyAttack",
       "audio": "assets/audio/audio4.mp3"
     },
     {
@@ -52,7 +54,7 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model5.glb",
       "skala": 0.5,
-      "animasiAksi": "NAMA_KLIP_AKSI",
+      "animasiAksi": "animation",
       "audio": "assets/audio/audio5.mp3"
     }
   ]
