@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
-document.title = 'Poster Hidup v16';
+document.title = 'Poster Hidup v18';
 
 // ---------- Elemen HTML ----------
 const statusEl = document.getElementById('status');
@@ -112,19 +112,40 @@ async function startAR(targets) {
     anchor.group.add(model);
 
     const mixer = new THREE.AnimationMixer(model);
-    const find = n => gltf.animations.find(a => a.name === n);
-    const idleClip = find(t.animasiIdle) || gltf.animations[0];
-    const aksiClip = find(t.animasiAksi);
+    const find = n => (n ? gltf.animations.find(a => a.name === n) : undefined);
+
+    // Idle HANYA jika "animasiIdle" diisi di targets.json.
+    // Jika dikosongkan, model diam saat discan dan baru bergerak saat diketuk.
+    let idleClip = find(t.animasiIdle) || null;
+    // Klip aksi: sesuai "animasiAksi", atau klip pertama yang bukan idle
+    const aksiClip = find(t.animasiAksi)
+      || gltf.animations.find(a => a !== idleClip)
+      || null;
+    if (idleClip && idleClip === aksiClip) idleClip = null;
+
     const idleAction = idleClip ? mixer.clipAction(idleClip) : null;
     const aksiAction = aksiClip ? mixer.clipAction(aksiClip) : null;
+
+    // Tahan model di frame pertama klip aksi (pose diam)
+    const diamkan = () => {
+      if (!aksiAction) return;
+      aksiAction.reset().play();
+      aksiAction.paused = true;
+    };
+
     idleAction?.play();
     if (aksiAction) {
       aksiAction.setLoop(THREE.LoopOnce, 1);
       aksiAction.clampWhenFinished = true;
+      if (!idleAction) diamkan();
       mixer.addEventListener('finished', (event) => {
         if (event.action !== aksiAction) return;
-        aksiAction.fadeOut(0.15);
-        idleAction?.reset().fadeIn(0.15).play();
+        if (idleAction) {
+          aksiAction.fadeOut(0.15);
+          idleAction.reset().fadeIn(0.15).play();
+        } else {
+          diamkan(); // selesai: kembali diam, siap diketuk lagi
+        }
       });
     }
 
@@ -151,7 +172,12 @@ async function startAR(targets) {
       if (s) { s.pause(); s.currentTime = 0; }
     };
 
-    items.push({ anchor, model, mixer, idleAction, aksiAction, data: t, tapAnimation: null });
+    items.push({
+      anchor, model, mixer, idleAction, aksiAction, data: t, tapAnimation: null,
+      rotasiAwal: model.rotation.y,
+      posYAwal: model.position.y,
+      skalaAwal: model.scale.x
+    });
   }
 
   // ---------- Interaksi sentuh: ketuk dan cubit ----------
@@ -178,7 +204,7 @@ async function startAR(targets) {
       item.idleAction?.fadeOut(0.12);
       item.aksiAction.reset().fadeIn(0.12).play();
     } else {
-      item.tapAnimation = { startedAt: performance.now(), startRotation: item.model.rotation.y };
+      item.tapAnimation = { startedAt: performance.now(), startRotation: item.rotasiAwal };
     }
     if (navigator.vibrate) navigator.vibrate(30);
   }
@@ -226,7 +252,11 @@ async function startAR(targets) {
     if (!pinchSession || !pinchSession.pointerIds.every(id => activePointers.has(id))) return;
     const points = pinchSession.pointerIds.map(id => activePointers.get(id));
     const factor = distance(points[0], points[1]) / pinchSession.startDistance;
-    const scale = THREE.MathUtils.clamp(pinchSession.startScale * factor, 0.1, 3);
+    const scale = THREE.MathUtils.clamp(
+      pinchSession.startScale * factor,
+      pinchSession.item.skalaAwal * 0.3,
+      pinchSession.item.skalaAwal * 4
+    );
     pinchSession.item.model.scale.setScalar(scale);
   });
 
@@ -281,10 +311,13 @@ async function startAR(targets) {
     const dt = clock.getDelta();
     items.forEach(it => {
       it.mixer.update(dt);
+      const now = performance.now();
       if (it.tapAnimation) {
-        const progress = Math.min((performance.now() - it.tapAnimation.startedAt) / 700, 1);
+        // Aksi ketuk buatan kode (model tanpa klip aksi): putar 360 derajat + melompat
+        const progress = Math.min((now - it.tapAnimation.startedAt) / 700, 1);
         const eased = 1 - (1 - progress) ** 3;
         it.model.rotation.y = it.tapAnimation.startRotation + Math.PI * 2 * eased;
+        it.model.position.y = it.posYAwal + Math.sin(progress * Math.PI) * 0.08;
         if (progress === 1) it.tapAnimation = null;
       }
     });

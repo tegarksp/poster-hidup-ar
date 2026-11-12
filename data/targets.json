@@ -8,7 +8,6 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
-      "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio1.mp3"
     },
@@ -20,7 +19,6 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model2.glb",
       "skala": 0.5,
-      "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio2.mp3"
     },
@@ -32,7 +30,6 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model3.glb",
       "skala": 0.5,
-      "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio3.mp3"
     },
@@ -44,7 +41,6 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model4.glb",
       "skala": 0.5,
-      "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio4.mp3"
     },
@@ -56,7 +52,6 @@
       "tautan": "https://contoh.ac.id",
       "model": "assets/models/model5.glb",
       "skala": 0.5,
-      "animasiIdle": "NAMA_KLIP_IDLE",
       "animasiAksi": "NAMA_KLIP_AKSI",
       "audio": "assets/audio/audio5.mp3"
     }
