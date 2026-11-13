@@ -1,13 +1,27 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from 'mindar-image-three';
-document.title = 'Poster Hidup v18';
+document.title = 'Poster Hidup | FIKTI UMSU';
 
 // ---------- Elemen HTML ----------
 const statusEl = document.getElementById('status');
+const statusTextEl = document.getElementById('status-text');
 const panel = document.getElementById('info-panel');
 const errorBox = document.getElementById('error-box');
 const startBtn = document.getElementById('start-btn');
+const welcomeScreen = document.getElementById('welcome-screen');
+const descriptionEl = document.getElementById('info-deskripsi');
+const descriptionToggle = document.getElementById('description-toggle');
+const scanCountEls = [document.getElementById('scan-count'), document.getElementById('scan-count-hud')];
+const scanTotalEls = [document.getElementById('scan-total'), document.getElementById('scan-total-hud')];
+const prodiLinkEls = [document.getElementById('prodi-link'), document.getElementById('info-prodi-link')];
+
+descriptionToggle.addEventListener('click', () => {
+  const expanded = descriptionToggle.getAttribute('aria-expanded') === 'true';
+  descriptionToggle.setAttribute('aria-expanded', String(!expanded));
+  descriptionToggle.textContent = expanded ? 'Tampilkan lebih banyak' : 'Tampilkan lebih sedikit';
+  descriptionEl.classList.toggle('expanded', !expanded);
+});
 
 function showError(msg) {
   errorBox.textContent = msg;
@@ -15,18 +29,13 @@ function showError(msg) {
 }
 
 function setStatus(text, found = false) {
-  statusEl.textContent = text;
+  statusTextEl.textContent = text;
   statusEl.classList.toggle('found', found);
 }
 
-// ---------- Penyimpanan lokal ----------
-const KEY = 'poster-hidup:dipindai';
-function loadScanned() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || []; }
-  catch { return []; }
-}
-function saveScanned(list) {
-  try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
+function updateScanCount(scanned, total) {
+  scanCountEls.forEach(el => { el.textContent = String(scanned.size); });
+  scanTotalEls.forEach(el => { el.textContent = String(total); });
 }
 
 // ---------- Muat data JSON + validasi ----------
@@ -34,6 +43,8 @@ async function loadTargets() {
   const res = await fetch('data/targets.json');
   if (!res.ok) throw new Error('Gagal memuat targets.json');
   const data = await res.json();
+  if (!data.prodi || typeof data.prodi.url !== 'string' || !data.prodi.url)
+    throw new Error('Tautan situs prodi belum diatur pada targets.json');
   if (!Array.isArray(data.targets) || data.targets.length === 0)
     throw new Error('Data target kosong atau format salah');
   for (const t of data.targets) {
@@ -42,7 +53,7 @@ async function loadTargets() {
         throw new Error(`Field "${f}" hilang pada target ${t.id ?? '?'}`);
     }
   }
-  return data.targets;
+  return data;
 }
 
 // ---------- Audio ----------
@@ -69,22 +80,28 @@ function unlockAudio() {
 
 // ---------- Langkah 1: init (muat data, tampilkan tombol) ----------
 async function init() {
-  let targets;
-  try { targets = await loadTargets(); }
+  let data;
+  try { data = await loadTargets(); }
   catch (e) { return showError(e.message); }
+  const { targets, prodi } = data;
+  const scanned = new Set();
 
+  updateScanCount(scanned, targets.length);
+  prodiLinkEls.forEach(link => {
+    link.href = prodi.url;
+    link.setAttribute('aria-label', `Buka situs ${prodi.nama}`);
+  });
   prepareAudio(targets);
   setStatus('Siap. Ketuk tombol untuk memulai kamera');
-  startBtn.classList.remove('hidden');
   startBtn.addEventListener('click', () => {
-    startBtn.classList.add('hidden');
+    welcomeScreen.classList.add('hidden');
     unlockAudio();
-    startAR(targets);
+    startAR(targets, scanned);
   }, { once: true });
 }
 
 // ---------- Langkah 2: startAR (dulu bernama start) ----------
-async function startAR(targets) {
+async function startAR(targets, scanned) {
   const mindarThree = new MindARThree({
     container: document.getElementById('ar-container'),
     imageTargetSrc: 'assets/targets/targets.mind',
@@ -96,7 +113,6 @@ async function startAR(targets) {
 
   const loader = new GLTFLoader();
   const clock = new THREE.Clock();
-  const scanned = new Set(loadScanned());
   const items = []; // { anchor, model, mixer, idleAction, aksiAction, data }
 
   for (const [i, t] of targets.entries()) {
@@ -152,14 +168,21 @@ async function startAR(targets) {
     anchor.onTargetFound = () => {
       setStatus('Target ditemukan: ' + t.judul, true);
       document.getElementById('info-judul').textContent = t.judul;
-      document.getElementById('info-deskripsi').textContent = t.deskripsi;
+      descriptionEl.textContent = t.deskripsi;
+      descriptionEl.classList.remove('expanded');
+      descriptionToggle.setAttribute('aria-expanded', 'false');
+      descriptionToggle.textContent = 'Tampilkan lebih banyak';
       const a = document.getElementById('info-tautan');
       if (t.tautan) { a.href = t.tautan; a.classList.remove('hidden'); }
       else a.classList.add('hidden');
       panel.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        const isLong = descriptionEl.scrollHeight > descriptionEl.clientHeight + 1;
+        descriptionToggle.classList.toggle('hidden', !isLong);
+      });
 
       scanned.add(t.id);
-      saveScanned([...scanned]);
+      updateScanCount(scanned, targets.length);
 
       sounds[t.id]?.play().catch(() => {});
     };

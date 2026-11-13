@@ -1,11 +1,15 @@
 {
+  "prodi": {
+    "nama": "FIKTI UMSU",
+    "url": "https://fikti.umsu.ac.id"
+  },
   "targets": [
     {
       "index": 0,
       "id": "target-1",
-      "judul": "ISI JUDUL 1",
-      "deskripsi": "ISI DESKRIPSI 1",
-      "tautan": "https://contoh.ac.id",
+      "judul": "JUARA 1 LIGA 1 INDONESIA 2023/2024",
+      "deskripsi": "SELAMAT & SUKSES! 🔥⚽\n\nCivitas Akademika Fakultas Ilmu Komputer dan Teknologi Informasi UMSU mengucapkan:\n\nSELAMAT DAN SUKSES\nKepada Mahasiswa FIKTI UMSU\nAtas Prestasi Gemilang Meraih\n\nJUARA 1 TOURNAMEN FUTSAL\nYang diselenggarakan oleh PK IMM FKIP UMSU Tahun 2026\nIMMSSAC XII\nKerja keras, kekompakan, dan sportivitas yang luar biasa! 💪\nTidak hanya unggul dalam teknologi, mahasiswa FIKTI juga membuktikan prestasi di bidang olahraga.",
+      "tautan": "https://www.instagram.com/p/DfPK0uhmt5p/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
       "animasiAksi": "Armature|ArmatureAction",
@@ -14,9 +18,9 @@
     {
       "index": 1,
       "id": "target-2",
-      "judul": "ISI JUDUL 2",
-      "deskripsi": "ISI DESKRIPSI 2",
-      "tautan": "https://contoh.ac.id",
+      "judul": "Civitas Akademika FIKTI UMSU Mengucapkan Dirgahayu Republik Indonesia ke-81",
+      "deskripsi": "Civitas Akademika FIKTI UMSU Mengucapkan Dirgahayu Republik Indonesia ke-81 🇮🇩\n\nSemangat kemerdekaan adalah semangat untuk terus belajar, berkarya, berinovasi, dan memberikan kontribusi terbaik bagi bangsa.\nDi usia ke-81 tahun, Indonesia terus melangkah menghadapi berbagai tantangan dan peluang di era transformasi digital. Sebagai bagian dari generasi penerus bangsa, mari bersama-sama memperkuat persatuan, menjunjung tinggi nilai-nilai kebangsaan, serta menghadirkan karya dan inovasi yang bermanfaat bagi masyarakat.\nKemerdekaan yang diwariskan para pahlawan menjadi pengingat bahwa masa depan Indonesia dibangun oleh sumber daya manusia yang unggul, berkarakter, dan berintegritas.\nDirgahayu Republik Indonesia\n17 Agustus 1945 - 17 Agustus 2026\nIndonesia Berdaulat, Adil, dan Makmur. ❤️🤍\n\n[#DirgahayuRI81] [#HUTRI81] [#IndonesiaMerdeka] [#17Agustus2026]",
+      "tautan": "https://www.instagram.com/p/DcGvNHePjcD/?xtok=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model2.glb",
       "skala": 0.5,
       "animasiIdle": "idle",
@@ -26,9 +30,9 @@
     {
       "index": 2,
       "id": "target-3",
-      "judul": "ISI JUDUL 3",
-      "deskripsi": "ISI DESKRIPSI 3",
-      "tautan": "https://contoh.ac.id",
+      "judul": "AYO DAFTAR DI FIKTI UMSU!",
+      "deskripsi": "🚀 AGUSTUS, A-nya AYO DAFTAR DI FIKTI! 💙💛\n\nBuat kamu yang punya passion di dunia teknologi dan ingin punya masa depan di era digital, ini saatnya bergabung bersama FIKTI UMSU! 🎓✨\n\n📚 Pilihan Program Studi:\n💻 Sistem Informasi\n🖥️ Teknologi Informasi\n📊 Sains Data\n\n⏰ Pendaftaran dibuka sampai 30 Agustus 2026!\n\n🎁 Khusus periode ini, dapatkan DISKON DPP hingga 50%! 🔥\n\nJangan cuma punya cita-cita, mulai langkahmu sekarang! 🌟\n\n📲 Scan QR Code pada poster atau kunjungi: fikti.umsu.ac.id\n\nYuk, jadi bagian dari generasi Teknologi Cerdas, Masa Depan Berdampak! 💙\n\n#FIKTIUMSU #UMSU #AyoDaftarFIKTI #KuliahTeknologi #SistemInformasi TeknologiInformasi SainsData MahasiswaUMSU KampusDigital DiskonDPP50 PendaftaranMahasiswaBaru",
+      "tautan": "https://www.instagram.com/p/DcNHfjDNpgF/?mdxt=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model3.glb",
       "skala": 0.5,
       "animasiAksi": "animat",
@@ -37,9 +41,9 @@
     {
       "index": 3,
       "id": "target-4",
-      "judul": "ISI JUDUL 4",
-      "deskripsi": "ISI DESKRIPSI 4",
-      "tautan": "https://contoh.ac.id",
+      "judul": "PENUTUPAN PENDAFTARAN MAHASISWA BARU FIKTI UMSU",
+      "deskripsi": "TINGGAL 7 HARI LAGI! 🚨\n\nMasa depan di bidang teknologi sudah menunggu kamu! 💙💛\n\nJangan sampai kesempatanmu kuliah di FIKTI UMSU terlewat begitu saja. Pilih program studi yang sesuai dengan minat dan passion kamu:\n💻 Sistem Informasi\n☁️ Teknologi Informasi\n📊 Sains Data\n\n📅 Pendaftaran ditutup 24 September 2026!\n\n✨ Daftar sekarang dan wujudkan masa depanmu bersama FIKTI UMSU!\n\n🌐 daftar.umsu.ac.id\n\nJangan tunggu sampai kesempatan terakhir. Saatnya TeknologiCerdas, TeknologiModern! 🚀\n\n#FIKTIUMSU #UMSU#UMSUMEDAN#medan",
+      "tautan": "https://www.instagram.com/p/DdXpt3DP7WJ/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model4.glb",
       "skala": 0.5,
       "animasiIdle": "Idle",
@@ -49,9 +53,9 @@
     {
       "index": 4,
       "id": "target-5",
-      "judul": "ISI JUDUL 5",
-      "deskripsi": "ISI DESKRIPSI 5",
-      "tautan": "https://contoh.ac.id",
+      "judul": "PROGRAM BEASISWA MAHASISWA DISABILITAS",
+      "deskripsi": "🎓✨ PROGRAM BEASISWA MAHASISWA DISABILITAS – GELOMBANG 1\n\nUniversitas Muhammadiyah Sumatera Utara (UMSU) kembali membuka kesempatan bagi mahasiswa disabilitas untuk mendapatkan dukungan pendidikan melalui Program Beasiswa Mahasiswa Disabilitas Gelombang 1. 💙\n\nJangan lewatkan kesempatan ini untuk terus berkembang, berprestasi, dan meraih cita-cita tanpa batas. ♿🌟\n\n📌 Yuk, cek informasi selengkapnya dan segera daftarkan diri!\n\nContact Person:\n0822-1769-6966",
+      "tautan": "https://www.instagram.com/p/Db-6c0ikxPY/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model5.glb",
       "skala": 0.5,
       "animasiAksi": "animation",
