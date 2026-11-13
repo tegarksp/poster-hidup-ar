@@ -35,7 +35,8 @@
       "tautan": "https://www.instagram.com/p/DcNHfjDNpgF/?mdxt=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model3.glb",
       "skala": 0.5,
-      "animasiAksi": "animat",
+      "animasiIdle": "arlo_bm_idle",
+      "animasiAksi": "bls_atk_scharge",
       "audio": "assets/audio/audio3.mp3"
     },
     {
