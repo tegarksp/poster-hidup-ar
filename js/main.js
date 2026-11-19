@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { MindARThree } from 'mindar-image-three';
 document.title = 'Poster Hidup | FIKTI UMSU';
 
@@ -15,6 +16,7 @@ const descriptionToggle = document.getElementById('description-toggle');
 const scanCountEls = [document.getElementById('scan-count'), document.getElementById('scan-count-hud')];
 const scanTotalEls = [document.getElementById('scan-total'), document.getElementById('scan-total-hud')];
 const prodiLinkEls = [document.getElementById('prodi-link'), document.getElementById('info-prodi-link')];
+const scannedTargetsStorageKey = 'poster-hidup-ar:scanned-targets';
 
 descriptionToggle.addEventListener('click', () => {
   const expanded = descriptionToggle.getAttribute('aria-expanded') === 'true';
@@ -36,6 +38,37 @@ function setStatus(text, found = false) {
 function updateScanCount(scanned, total) {
   scanCountEls.forEach(el => { el.textContent = String(scanned.size); });
   scanTotalEls.forEach(el => { el.textContent = String(total); });
+}
+
+function loadScannedTargets(targets) {
+  let saved;
+  try {
+    saved = localStorage.getItem(scannedTargetsStorageKey);
+  } catch (error) {
+    throw new Error(`Gagal membaca daftar target dari penyimpanan lokal: ${error.message}`);
+  }
+  if (saved === null) return new Set();
+
+  let ids;
+  try {
+    ids = JSON.parse(saved);
+  } catch {
+    throw new Error('Data target tersimpan rusak. Hapus data situs ini dari pengaturan browser lalu muat ulang.');
+  }
+  if (!Array.isArray(ids) || !ids.every(id => typeof id === 'string')) {
+    throw new Error('Format daftar target tersimpan tidak valid. Hapus data situs ini dari pengaturan browser lalu muat ulang.');
+  }
+
+  const targetIds = new Set(targets.map(target => target.id));
+  return new Set(ids.filter(id => targetIds.has(id)));
+}
+
+function saveScannedTargets(scanned) {
+  try {
+    localStorage.setItem(scannedTargetsStorageKey, JSON.stringify([...scanned]));
+  } catch (error) {
+    throw new Error(`Gagal menyimpan daftar target ke penyimpanan lokal: ${error.message}`);
+  }
 }
 
 // ---------- Muat data JSON + validasi ----------
@@ -84,7 +117,9 @@ async function init() {
   try { data = await loadTargets(); }
   catch (e) { return showError(e.message); }
   const { targets, prodi } = data;
-  const scanned = new Set();
+  let scanned;
+  try { scanned = loadScannedTargets(targets); }
+  catch (e) { return showError(e.message); }
 
   updateScanCount(scanned, targets.length);
   prodiLinkEls.forEach(link => {
@@ -112,6 +147,7 @@ async function startAR(targets, scanned) {
   scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5));
 
   const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
   const clock = new THREE.Clock();
   const items = []; // { anchor, model, mixer, idleAction, aksiAction, data }
 
@@ -121,7 +157,10 @@ async function startAR(targets, scanned) {
 
     let gltf;
     try { gltf = await loader.loadAsync(t.model); }
-    catch { return showError('Gagal memuat model: ' + t.model); }
+    catch (error) {
+      console.error('Gagal memuat model:', t.model, error);
+      return showError(`Gagal memuat model: ${t.model}. ${error.message}`);
+    }
 
     const model = gltf.scene;
     model.scale.setScalar(t.skala ?? 0.5);
@@ -183,6 +222,8 @@ async function startAR(targets, scanned) {
 
       scanned.add(t.id);
       updateScanCount(scanned, targets.length);
+      try { saveScannedTargets(scanned); }
+      catch (e) { showError(e.message); }
 
       sounds[t.id]?.play().catch(() => {});
     };

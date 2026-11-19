@@ -30,10 +30,10 @@ informasi serta konten interaktif FIKTI UMSU.
 | No | Gambar target | Objek 3D | Isi panel info |
 |---|---|---|---|
 | 1 | Poster prestasi FIKTI (judul data: “JUARA 1 LIGA 1 INDONESIA 2023/2024”) | THE_BANANA_CAT (`model1.glb`) | Ucapan selamat kepada mahasiswa atas prestasi turnamen futsal dan tautan ke unggahan terkait |
-| 2 | Poster Dirgahayu Republik Indonesia ke-81 | Lightning McQueen (`model2.glb`) | Ucapan kemerdekaan dan pesan kebangsaan |
-| 3 | Poster ajakan mendaftar ke FIKTI UMSU | Arlo (`model3.glb`) | Informasi program studi, pendaftaran, dan tautan ke unggahan terkait |
-| 4 | Poster penutupan pendaftaran mahasiswa baru | Animated Swan (`model4.glb`) | Pengingat penutupan pendaftaran dan informasi program studi |
-| 5 | Poster Program Beasiswa Mahasiswa Disabilitas | Professor Z (`model5.glb`) | Informasi program beasiswa dan kontak |
+| 2 | Poster Dirgahayu Republik Indonesia ke-81 | THE_BANANA_CAT (`model1.glb`) | Ucapan kemerdekaan dan pesan kebangsaan |
+| 3 | Poster ajakan mendaftar ke FIKTI UMSU | THE_BANANA_CAT (`model1.glb`) | Informasi program studi, pendaftaran, dan tautan ke unggahan terkait |
+| 4 | Poster penutupan pendaftaran mahasiswa baru | THE_BANANA_CAT (`model1.glb`) | Pengingat penutupan pendaftaran dan informasi program studi |
+| 5 | Poster Program Beasiswa Mahasiswa Disabilitas | THE_BANANA_CAT (`model1.glb`) | Informasi program beasiswa dan kontak |
 
 Judul, deskripsi, tautan, model, dan konfigurasi animasi tiap target dibaca dari
 `data/targets.json`; tidak ditulis langsung sebagai konten target di kode.
@@ -47,11 +47,12 @@ Judul, deskripsi, tautan, model, dan konfigurasi animasi tiap target dibaca dari
 - Panel informasi muncul ketika target ditemukan dan disembunyikan saat target hilang.
 - Status layar menampilkan proses pencarian dan target yang ditemukan.
 - Audio singkat per target dan tautan ke unggahan terkait serta situs FIKTI.
-- Penghitung target yang telah dipindai selama sesi halaman yang sedang dibuka.
+- Daftar target yang telah dipindai disimpan di `localStorage` dan tetap tersedia
+  setelah halaman dimuat ulang pada browser/perangkat yang sama.
 - Pesan penanganan jika akses kamera ditolak atau kamera tidak tersedia.
 
-**Catatan persistence:** data target dimuat dari JSON. Penghitung pindai saat ini
-hanya disimpan di memori selama sesi halaman dan belum menggunakan `localStorage`.
+**Persistence:** konten target dimuat dari JSON, sedangkan ID target yang telah
+dipindai disimpan secara lokal di browser menggunakan `localStorage`.
 
 ## 4. Teknologi
 
@@ -91,7 +92,7 @@ menggunakan Three.js 0.160.0 secara konsisten.
 ## 7. Rencana menuju UAS
 
 - Menambah atau mengganti gambar target dan kontennya melalui `targets.json`.
-- Menyimpan daftar target yang telah dipindai ke `localStorage`.
+- Menyempurnakan persistence dan pengalaman pengguna berdasarkan hasil uji.
 - Menyempurnakan kestabilan tracking, ukuran aset, dan performa di ponsel.
 - Mengembangkan kuis singkat per target atau mengevaluasi perluasan ke POI indoor
   sebagai pondasi Level B.
@@ -104,7 +105,7 @@ menggunakan Three.js 0.160.0 secara konsisten.
 | Performa atau pemuatan awal lambat di ponsel | Optimalkan ukuran gambar target dan model, serta batasi jumlah target |
 | Pantulan pada kertas atau layar mengganggu tracking | Uji di layar dan kertas cetak dengan pencahayaan yang memadai |
 | Atribusi atau izin aset belum lengkap | Verifikasi sumber dan izin; lengkapi tabel lisensi sebelum distribusi |
-| Daftar pindai belum tersimpan setelah halaman ditutup | Implementasikan dan uji persistence `localStorage` |
+| Penyimpanan browser dapat dinonaktifkan atau penuh | Tampilkan pesan jika data pindai gagal dibaca atau disimpan |
 
 Hasil pengujian perangkat yang tercatat: laptop Windows 11/Chrome, Infinix GT 10
 Pro/Android 14/Chrome, iPhone 17 Pro/iOS 26/Safari, Vivo Y33s/Android 11/Chrome,
@@ -117,10 +118,10 @@ ada di `docs/device-matrix.md`.
 
 - Pemrosesan kamera dilakukan di perangkat; video dan data lokasi tidak diunggah
   ke server.
-- Data target dimuat dari `data/targets.json`. Penghitung pindai belum persisten
-  dan saat ini hanya hidup selama sesi halaman.
+- Data target dimuat dari `data/targets.json`. ID target yang telah dipindai
+  disimpan di `localStorage` browser, tidak dikirim ke server.
 - Model 3D dicatat berlisensi Creative Commons Attribution (CC BY) di
   `docs/asset-licenses.md`.
 - Sumber atau izin gambar target dan audio masih perlu dikonfirmasi menurut
-  tabel lisensi aset. Pastikan atribusi dan izin penggunaan dilengkapi sebelum
+  tabel lisensi aset  . Pastikan atribusi dan izin penggunaan dilengkapi sebelum
   distribusi publik.

@@ -61,7 +61,8 @@ index.html, css/, js/main.js, data/targets.json, assets/ (models, targets, audio
 ## Privasi
 Pemrosesan kamera dilakukan di perangkat. Tidak ada video atau data lokasi yang
 diunggah ke server. Data yang disimpan hanya daftar target yang sudah dipindai
-(localStorage di perangkat).
+(localStorage di perangkat). Daftar ini dimuat kembali saat halaman dibuka lagi
+di browser yang sama; data tidak disinkronkan ke perangkat lain.
 
 ## Dokumentasi
 - docs/device-matrix.md, docs/asset-licenses.md, docs/issue-log.md, docs/project-brief.md
