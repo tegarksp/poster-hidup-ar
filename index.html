@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <title>Poster dan Brosur Hidup</title>
+  <title>Poster Hidup | FIKTI UMSU</title>
 
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <script type="importmap">
 {
@@ -20,14 +23,46 @@
 <body>
   <div id="ar-container"></div>
 
-  <div id="status">Memuat...</div>
+  <main id="welcome-screen" class="welcome-screen">
+    <img class="welcome-image" src="assets/targets/background.jpg" alt="Poster FIKTI UMSU" />
+    <div class="welcome-shade"></div>
+    <div class="welcome-content">
+      <header class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">F</span>
+        <span>FIKTI <b>UMSU</b></span>
+      </header>
+      <div class="welcome-title">
+        <p class="eyebrow">POSTER INTERAKTIF</p>
+        <h1>Poster<br /><span>Hidup.</span></h1>
+        <footer class="welcome-footer">
+          <div class="scan-progress" aria-live="polite">
+            <span class="progress-label">TARGET DIPINDAI</span>
+            <strong><span id="scan-count">0</span><span class="progress-divider">/</span><span id="scan-total">0</span></strong>
+          </div>
+          <div class="welcome-actions">
+            <button id="start-btn" type="button">Mulai AR <span aria-hidden="true">&#8594;</span></button>
+            <a id="prodi-link" class="prodi-link" href="#" target="_blank" rel="noopener">Situs Prodi <span aria-hidden="true">&#8599;</span></a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </main>
 
-  <button id="start-btn" class="hidden">Mulai AR</button>
+  <div id="status" class="status-hud">
+    <span class="live-indicator" aria-hidden="true"></span>
+    <span id="status-text">Memuat...</span>
+    <span class="hud-count"><span id="scan-count-hud">0</span>/<span id="scan-total-hud">0</span></span>
+  </div>
 
   <div id="info-panel" class="hidden">
     <h2 id="info-judul"></h2>
     <p id="info-deskripsi"></p>
-    <a id="info-tautan" href="#" target="_blank" rel="noopener">Buka situs</a>
+    <button id="description-toggle" class="description-toggle hidden" type="button"
+      aria-controls="info-deskripsi" aria-expanded="false">Tampilkan lebih banyak</button>
+    <div class="info-links">
+      <a id="info-tautan" class="target-link hidden" href="#" target="_blank" rel="noopener">Buka poster</a>
+      <a id="info-prodi-link" class="prodi-link" href="#" target="_blank" rel="noopener">Situs Prodi <span aria-hidden="true">&#8599;</span></a>
+    </div>
   </div>
 
   <div id="error-box" class="hidden"></div>

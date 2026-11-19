@@ -1,13 +1,29 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { MindARThree } from 'mindar-image-three';
-document.title = 'Poster Hidup v18';
+document.title = 'Poster Hidup | FIKTI UMSU';
 
 // ---------- Elemen HTML ----------
 const statusEl = document.getElementById('status');
+const statusTextEl = document.getElementById('status-text');
 const panel = document.getElementById('info-panel');
 const errorBox = document.getElementById('error-box');
 const startBtn = document.getElementById('start-btn');
+const welcomeScreen = document.getElementById('welcome-screen');
+const descriptionEl = document.getElementById('info-deskripsi');
+const descriptionToggle = document.getElementById('description-toggle');
+const scanCountEls = [document.getElementById('scan-count'), document.getElementById('scan-count-hud')];
+const scanTotalEls = [document.getElementById('scan-total'), document.getElementById('scan-total-hud')];
+const prodiLinkEls = [document.getElementById('prodi-link'), document.getElementById('info-prodi-link')];
+const scannedTargetsStorageKey = 'poster-hidup-ar:scanned-targets';
+
+descriptionToggle.addEventListener('click', () => {
+  const expanded = descriptionToggle.getAttribute('aria-expanded') === 'true';
+  descriptionToggle.setAttribute('aria-expanded', String(!expanded));
+  descriptionToggle.textContent = expanded ? 'Tampilkan lebih banyak' : 'Tampilkan lebih sedikit';
+  descriptionEl.classList.toggle('expanded', !expanded);
+});
 
 function showError(msg) {
   errorBox.textContent = msg;
@@ -15,18 +31,44 @@ function showError(msg) {
 }
 
 function setStatus(text, found = false) {
-  statusEl.textContent = text;
+  statusTextEl.textContent = text;
   statusEl.classList.toggle('found', found);
 }
 
-// ---------- Penyimpanan lokal ----------
-const KEY = 'poster-hidup:dipindai';
-function loadScanned() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || []; }
-  catch { return []; }
+function updateScanCount(scanned, total) {
+  scanCountEls.forEach(el => { el.textContent = String(scanned.size); });
+  scanTotalEls.forEach(el => { el.textContent = String(total); });
 }
-function saveScanned(list) {
-  try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
+
+function loadScannedTargets(targets) {
+  let saved;
+  try {
+    saved = localStorage.getItem(scannedTargetsStorageKey);
+  } catch (error) {
+    throw new Error(`Gagal membaca daftar target dari penyimpanan lokal: ${error.message}`);
+  }
+  if (saved === null) return new Set();
+
+  let ids;
+  try {
+    ids = JSON.parse(saved);
+  } catch {
+    throw new Error('Data target tersimpan rusak. Hapus data situs ini dari pengaturan browser lalu muat ulang.');
+  }
+  if (!Array.isArray(ids) || !ids.every(id => typeof id === 'string')) {
+    throw new Error('Format daftar target tersimpan tidak valid. Hapus data situs ini dari pengaturan browser lalu muat ulang.');
+  }
+
+  const targetIds = new Set(targets.map(target => target.id));
+  return new Set(ids.filter(id => targetIds.has(id)));
+}
+
+function saveScannedTargets(scanned) {
+  try {
+    localStorage.setItem(scannedTargetsStorageKey, JSON.stringify([...scanned]));
+  } catch (error) {
+    throw new Error(`Gagal menyimpan daftar target ke penyimpanan lokal: ${error.message}`);
+  }
 }
 
 // ---------- Muat data JSON + validasi ----------
@@ -34,6 +76,8 @@ async function loadTargets() {
   const res = await fetch('data/targets.json');
   if (!res.ok) throw new Error('Gagal memuat targets.json');
   const data = await res.json();
+  if (!data.prodi || typeof data.prodi.url !== 'string' || !data.prodi.url)
+    throw new Error('Tautan situs prodi belum diatur pada targets.json');
   if (!Array.isArray(data.targets) || data.targets.length === 0)
     throw new Error('Data target kosong atau format salah');
   for (const t of data.targets) {
@@ -42,7 +86,7 @@ async function loadTargets() {
         throw new Error(`Field "${f}" hilang pada target ${t.id ?? '?'}`);
     }
   }
-  return data.targets;
+  return data;
 }
 
 // ---------- Audio ----------
@@ -69,22 +113,30 @@ function unlockAudio() {
 
 // ---------- Langkah 1: init (muat data, tampilkan tombol) ----------
 async function init() {
-  let targets;
-  try { targets = await loadTargets(); }
+  let data;
+  try { data = await loadTargets(); }
+  catch (e) { return showError(e.message); }
+  const { targets, prodi } = data;
+  let scanned;
+  try { scanned = loadScannedTargets(targets); }
   catch (e) { return showError(e.message); }
 
+  updateScanCount(scanned, targets.length);
+  prodiLinkEls.forEach(link => {
+    link.href = prodi.url;
+    link.setAttribute('aria-label', `Buka situs ${prodi.nama}`);
+  });
   prepareAudio(targets);
   setStatus('Siap. Ketuk tombol untuk memulai kamera');
-  startBtn.classList.remove('hidden');
   startBtn.addEventListener('click', () => {
-    startBtn.classList.add('hidden');
+    welcomeScreen.classList.add('hidden');
     unlockAudio();
-    startAR(targets);
+    startAR(targets, scanned);
   }, { once: true });
 }
 
 // ---------- Langkah 2: startAR (dulu bernama start) ----------
-async function startAR(targets) {
+async function startAR(targets, scanned) {
   const mindarThree = new MindARThree({
     container: document.getElementById('ar-container'),
     imageTargetSrc: 'assets/targets/targets.mind',
@@ -95,8 +147,8 @@ async function startAR(targets) {
   scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.5));
 
   const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
   const clock = new THREE.Clock();
-  const scanned = new Set(loadScanned());
   const items = []; // { anchor, model, mixer, idleAction, aksiAction, data }
 
   for (const [i, t] of targets.entries()) {
@@ -105,7 +157,10 @@ async function startAR(targets) {
 
     let gltf;
     try { gltf = await loader.loadAsync(t.model); }
-    catch { return showError('Gagal memuat model: ' + t.model); }
+    catch (error) {
+      console.error('Gagal memuat model:', t.model, error);
+      return showError(`Gagal memuat model: ${t.model}. ${error.message}`);
+    }
 
     const model = gltf.scene;
     model.scale.setScalar(t.skala ?? 0.5);
@@ -152,14 +207,23 @@ async function startAR(targets) {
     anchor.onTargetFound = () => {
       setStatus('Target ditemukan: ' + t.judul, true);
       document.getElementById('info-judul').textContent = t.judul;
-      document.getElementById('info-deskripsi').textContent = t.deskripsi;
+      descriptionEl.textContent = t.deskripsi;
+      descriptionEl.classList.remove('expanded');
+      descriptionToggle.setAttribute('aria-expanded', 'false');
+      descriptionToggle.textContent = 'Tampilkan lebih banyak';
       const a = document.getElementById('info-tautan');
       if (t.tautan) { a.href = t.tautan; a.classList.remove('hidden'); }
       else a.classList.add('hidden');
       panel.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        const isLong = descriptionEl.scrollHeight > descriptionEl.clientHeight + 1;
+        descriptionToggle.classList.toggle('hidden', !isLong);
+      });
 
       scanned.add(t.id);
-      saveScanned([...scanned]);
+      updateScanCount(scanned, targets.length);
+      try { saveScannedTargets(scanned); }
+      catch (e) { showError(e.message); }
 
       sounds[t.id]?.play().catch(() => {});
     };
@@ -184,10 +248,15 @@ async function startAR(targets) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const canvas = renderer.domElement;
-  canvas.style.touchAction = 'none';
+  const interactionArea = mindarThree.container;
+  interactionArea.style.touchAction = 'none';
+  canvas.style.pointerEvents = 'auto';
+  if (mindarThree.cssRenderer?.domElement) {
+    mindarThree.cssRenderer.domElement.style.pointerEvents = 'none';
+  }
 
   function itemAt(x, y) {
-    const r = canvas.getBoundingClientRect();
+    const r = interactionArea.getBoundingClientRect();
     pointer.x = ((x - r.left) / r.width) * 2 - 1;
     pointer.y = -((y - r.top) / r.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
@@ -215,9 +284,9 @@ async function startAR(targets) {
   let suppressTap = false;
   const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-  canvas.addEventListener('pointerdown', (e) => {
+  interactionArea.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-    canvas.setPointerCapture(e.pointerId);
+    interactionArea.setPointerCapture(e.pointerId);
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
     if (activePointers.size === 1) {
@@ -240,7 +309,7 @@ async function startAR(targets) {
     }
   });
 
-  canvas.addEventListener('pointermove', (e) => {
+  interactionArea.addEventListener('pointermove', (e) => {
     if (!activePointers.has(e.pointerId)) return;
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
@@ -271,8 +340,8 @@ async function startAR(targets) {
     if (activePointers.size === 0) suppressTap = false;
   }
 
-  canvas.addEventListener('pointerup', finishPointer);
-  canvas.addEventListener('pointercancel', finishPointer);
+  interactionArea.addEventListener('pointerup', finishPointer);
+  interactionArea.addEventListener('pointercancel', finishPointer);
 
   // ---------- Nyalakan kamera ----------
   if (!window.isSecureContext) {
