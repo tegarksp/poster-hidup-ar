@@ -5,7 +5,6 @@ lalu objek 3D beranimasi dan panel informasi muncul.
 
 **Mata kuliah:** Prak. Augmented dan Virtual Reality (ITIA730591), Teknologi Informasi, FIKTI UMSU
 **Topik:** 2. Poster dan Brosur Hidup (MindAR image tracking)
-**Menuju UAS:** Level A (jalur gambar target)
 
 ## Tautan
 - Aplikasi (HTTPS): https://tegarksp.github.io/poster-hidup-ar/
@@ -38,7 +37,6 @@ Satu versi yang sama dipakai di seluruh repository.
 - [x] Data target di file JSON (bukan di kode), target yang sudah dipindai disimpan di localStorage
 - [x] Fitur pilihan: audio per target, tombol tautan ke situs
 
-(Centang hanya yang benar-benar berfungsi di HP Anda.)
 
 ## Cara menjalankan
 1. Buka https://tegarksp.github.io/poster-hidup-ar/ di Chrome (Android) atau Safari (iPhone).
@@ -53,8 +51,7 @@ Menjalankan lokal: buka folder repository di VS Code, lalu **Open with Live Serv
 index.html, css/, js/main.js, data/targets.json, assets/ (models, targets, audio), docs/
 
 ## Batasan yang diketahui
-- (ISI sesuai hasil uji, contoh: target di layar mengkilap sulit dikenali)
-- (ISI: hasil di iPhone, lihat docs/device-matrix.md)
+- target di layar mengkilap sulit dikenali
 - Pemuatan pertama di HP bisa lambat karena file target (.mind) dan model cukup besar
 - Target yang dipindai harus gambar yang sama dengan sumber kompilasi .mind
 
