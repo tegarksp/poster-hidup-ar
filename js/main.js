@@ -151,19 +151,24 @@ async function startAR(targets, scanned) {
   const clock = new THREE.Clock();
   const items = []; // { anchor, model, mixer, idleAction, aksiAction, data }
 
-  for (const [i, t] of targets.entries()) {
-    setStatus(`Memuat model ${i + 1} dari ${targets.length}...`);
-    const anchor = mindarThree.addAnchor(t.index);
-
-    let gltf;
-    try { gltf = await loader.loadAsync(t.model); }
+  const modelPaths = [...new Set(targets.map(target => target.model))];
+  const loadedModels = new Map();
+  for (const [i, path] of modelPaths.entries()) {
+    setStatus(`Memuat model ${i + 1} dari ${modelPaths.length}...`);
+    try { loadedModels.set(path, await loader.loadAsync(path)); }
     catch (error) {
-      console.error('Gagal memuat model:', t.model, error);
-      return showError(`Gagal memuat model: ${t.model}. ${error.message}`);
+      console.error('Gagal memuat model:', path, error);
+      return showError(`Gagal memuat model: ${path}. ${error.message}`);
     }
+  }
 
-    const model = gltf.scene;
+  for (const [i, t] of targets.entries()) {
+    setStatus(`Menyiapkan target ${i + 1} dari ${targets.length}...`);
+    const anchor = mindarThree.addAnchor(t.index);
+    const gltf = loadedModels.get(t.model);
+    const model = gltf.scene.clone(true);
     model.scale.setScalar(t.skala ?? 0.5);
+    model.rotation.y = t.rotasiY ?? 0;
     anchor.group.add(model);
 
     const mixer = new THREE.AnimationMixer(model);

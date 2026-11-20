@@ -12,6 +12,7 @@
       "tautan": "https://www.instagram.com/p/DfPK0uhmt5p/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
+      "rotasiY": -1.5707963267948966,
       "animasiAksi": "Armature|ArmatureAction",
       "audio": "assets/audio/audio1.mp3"
     },
@@ -23,6 +24,7 @@
       "tautan": "https://www.instagram.com/p/DcGvNHePjcD/?xtok=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
+      "rotasiY": -1.5707963267948966,
       "animasiIdle": "idle",
       "animasiAksi": "positive_reaction",
       "audio": "assets/audio/audio2.mp3"
@@ -35,6 +37,7 @@
       "tautan": "https://www.instagram.com/p/DcNHfjDNpgF/?mdxt=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
+      "rotasiY": -1.5707963267948966,
       "animasiIdle": "arlo_bm_idle",
       "animasiAksi": "bls_atk_scharge",
       "audio": "assets/audio/audio3.mp3"
@@ -47,6 +50,7 @@
       "tautan": "https://www.instagram.com/p/DdXpt3DP7WJ/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
+      "rotasiY": -1.5707963267948966,
       "animasiIdle": "Idle",
       "animasiAksi": "FlyAttack",
       "audio": "assets/audio/audio4.mp3"
@@ -59,6 +63,7 @@
       "tautan": "https://www.instagram.com/p/Db-6c0ikxPY/?exln=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==",
       "model": "assets/models/model1.glb",
       "skala": 0.5,
+      "rotasiY": -1.5707963267948966,
       "animasiAksi": "animation",
       "audio": "assets/audio/audio5.mp3"
     }

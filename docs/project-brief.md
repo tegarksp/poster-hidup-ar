@@ -42,7 +42,8 @@ Judul, deskripsi, tautan, model, dan konfigurasi animasi tiap target dibaca dari
 
 **Fitur yang tersedia:**
 - Lima gambar target berbeda, masing-masing terkait dengan model GLB.
-- Animasi model saat target ditemukan; ketuk model untuk memutar animasi aksi.
+- Model GLB dimuat satu kali dan dipakai ulang pada setiap target; ketuk model
+  untuk memutar animasi aksi.
 - Cubit dengan dua jari untuk memperbesar atau memperkecil model.
 - Panel informasi muncul ketika target ditemukan dan disembunyikan saat target hilang.
 - Status layar menampilkan proses pencarian dan target yang ditemukan.
